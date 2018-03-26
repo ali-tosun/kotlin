@@ -5,16 +5,17 @@
 
 package kotlin.script.experimental.basic
 
-import kotlin.reflect.KClass
 import kotlin.script.experimental.api.*
 
 
-class PassThroughCompilationConfigurator(val baseClass: KClass<Any>? = null) : ScriptCompilationConfigurator {
+class PassThroughCompilationConfigurator(val environment: ScriptingEnvironment) : ScriptCompilationConfigurator {
 
-    override val defaultConfiguration = ScriptCompileConfiguration()
+    override val defaultConfiguration = ScriptCompileConfiguration(
+        ScriptCompileConfigurationParams.baseClass to environment[ScriptingEnvironmentParams.baseClass]
+    )
 
     override suspend fun baseConfiguration(scriptSource: ScriptSource): ResultWithDiagnostics<ScriptCompileConfiguration> =
-        ScriptCompileConfiguration().asSuccess()
+        defaultConfiguration.asSuccess()
 
     override suspend fun refineConfiguration(
         configuration: ScriptCompileConfiguration,
@@ -23,7 +24,7 @@ class PassThroughCompilationConfigurator(val baseClass: KClass<Any>? = null) : S
         configuration.asSuccess()
 }
 
-class DummyEvaluator<ScriptBase : Any>(val baseClass: KClass<ScriptBase>? = null) : ScriptEvaluator<ScriptBase> {
+class DummyEvaluator<ScriptBase : Any>(val environment: ScriptingEnvironment) : ScriptEvaluator<ScriptBase> {
     override suspend fun eval(
         compiledScript: CompiledScript<ScriptBase>,
         scriptEvaluationEnvironment: ScriptEvaluationEnvironment

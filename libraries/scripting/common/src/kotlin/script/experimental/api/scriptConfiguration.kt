@@ -19,7 +19,6 @@ interface ScriptCompilationConfigurator {
 
     val defaultConfiguration: ScriptCompileConfiguration
 
-    // with null scriptSource should return a generic configuration for the script type
     suspend fun baseConfiguration(scriptSource: ScriptSource): ResultWithDiagnostics<ScriptCompileConfiguration>
 
     suspend fun refineConfiguration(
